@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<title>{% block title %}CyberAttend{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="public">
+    <canvas id="matrix"></canvas>
+    <div class="box {% block boxclass %}{% endblock %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, msg in messages %}
+                <div class="flash {{ 'error' if category=='error' else '' }}">{{ msg }}</div>
+            {% endfor %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</div>
+<script>
+(function () {
+    const c = document.getElementById('matrix'), x = c.getContext('2d');
+    function size() { c.width = innerWidth; c.height = innerHeight; }
+    size(); addEventListener('resize', size);
+    const chars = "01アイウエオカキクケコサシスセソ", fs = 16;
+    let drops = [];
+    setInterval(() => {
+        const cols = Math.floor(c.width / fs);
+        while (drops.length < cols) drops.push(1);
+        x.fillStyle = "rgba(5,7,10,0.08)"; x.fillRect(0, 0, c.width, c.height);
+        x.fillStyle = "#00ff9d"; x.font = fs + "px monospace";
+        for (let i = 0; i < cols; i++) {
+            x.fillText(chars[Math.floor(Math.random() * chars.length)], i * fs, drops[i] * fs);
+            if (drops[i] * fs > c.height && Math.random() > .975) drops[i] = 0;
+            drops[i]++;
+        }
+    }, 45);
+})();
+</script>
+<script src="{{ url_for('static', filename='js/face.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

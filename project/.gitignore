@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+*.pyc
+attendance.db*
+secret.key
+sync_key.txt
